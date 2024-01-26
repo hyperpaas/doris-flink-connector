@@ -104,13 +104,16 @@ public class DorisTypeMapper {
                 return DataTypes.CHAR(precision);
             case VARCHAR:
                 return DataTypes.VARCHAR(precision);
+            case ARRAY:
+                // Unable to obtain the generic subclass of array type.
+                // Here, return Array<string> as the type
+                return DataTypes.ARRAY(DataTypes.STRING());
             case LARGEINT:
             case STRING:
             case JSONB:
             case JSON:
                 // Currently, the subtype of the generic cannot be obtained,
                 // so it is mapped to string
-            case ARRAY:
             case MAP:
             case STRUCT:
                 return DataTypes.STRING();
@@ -221,7 +224,7 @@ public class DorisTypeMapper {
 
         @Override
         public String visit(ArrayType arrayType) {
-            return STRING;
+            return String.format(ArrayType.FORMAT, visit(arrayType.getElementType()));
         }
 
         @Override

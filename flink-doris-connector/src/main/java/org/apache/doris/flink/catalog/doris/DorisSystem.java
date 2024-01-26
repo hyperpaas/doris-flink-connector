@@ -249,7 +249,8 @@ public class DorisSystem implements Serializable {
         sql.append(identifier(field.getName())).append(" ").append(fieldType);
 
         if (field.getDefaultValue() != null) {
-            sql.append(" DEFAULT " + quoteDefaultValue(field.getDefaultValue()));
+            sql.append(" DEFAULT ")
+                .append(quoteDefaultValue(field.getDefaultValue()));
         }
         sql.append(" COMMENT '").append(quoteComment(field.getComment())).append("',");
     }
