@@ -222,10 +222,10 @@ public class DorisTypeMapper {
                     "%s(%s)", DorisType.DATETIME_V2, Math.min(Math.max(precision, 0), 6));
         }
 
-        @Override
-        public String visit(ArrayType arrayType) {
-            return String.format(ArrayType.FORMAT, visit(arrayType.getElementType()));
-        }
+    @Override
+    public String visit(ArrayType arrayType) {
+      return String.format(ArrayType.FORMAT, visit((VarCharType) arrayType.getElementType()));
+    }
 
         @Override
         public String visit(MapType mapType) {
