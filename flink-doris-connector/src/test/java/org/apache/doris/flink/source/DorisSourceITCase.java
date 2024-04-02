@@ -32,6 +32,8 @@ import org.apache.doris.flink.deserialization.SimpleListDeserializationSchema;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +41,7 @@ import java.util.List;
 
 /** DorisSource ITCase. */
 public class DorisSourceITCase extends DorisTestBase {
-    static final String DATABASE = "test";
+    static final String DATABASE = "test_source";
     static final String TABLE_READ = "tbl_read";
     static final String TABLE_READ_TBL = "tbl_read_tbl";
 
@@ -111,7 +113,10 @@ public class DorisSourceITCase extends DorisTestBase {
     }
 
     private void initializeTable(String table) throws Exception {
-        try (Statement statement = connection.createStatement()) {
+        try (Connection connection =
+                        DriverManager.getConnection(
+                                String.format(URL, DORIS_CONTAINER.getHost()), USERNAME, PASSWORD);
+                Statement statement = connection.createStatement()) {
             statement.execute(String.format("CREATE DATABASE IF NOT EXISTS %s", DATABASE));
             statement.execute(String.format("DROP TABLE IF EXISTS %s.%s", DATABASE, table));
             statement.execute(

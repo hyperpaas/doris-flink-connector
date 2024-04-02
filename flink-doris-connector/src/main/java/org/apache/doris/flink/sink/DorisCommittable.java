@@ -20,7 +20,7 @@ package org.apache.doris.flink.sink;
 import java.util.Objects;
 
 /** DorisCommittable hold the info for Committer to commit. */
-public class DorisCommittable {
+public class DorisCommittable implements DorisAbstractCommittable {
     private final String hostPort;
     private final String db;
     private final long txnID;

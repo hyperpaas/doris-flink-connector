@@ -17,10 +17,13 @@
 
 package org.apache.doris.flink.sink;
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+
+import java.util.concurrent.TimeUnit;
 
 /** util to build http client. */
 public class HttpUtil {
@@ -32,9 +35,37 @@ public class HttpUtil {
                                 protected boolean isRedirectable(String method) {
                                     return true;
                                 }
-                            });
+                            })
+                    .evictExpiredConnections()
+                    .evictIdleConnections(60, TimeUnit.SECONDS);
 
     public CloseableHttpClient getHttpClient() {
         return httpClientBuilder.build();
+    }
+
+    private RequestConfig requestConfig =
+            RequestConfig.custom()
+                    .setConnectTimeout(60 * 1000)
+                    .setConnectionRequestTimeout(60 * 1000)
+                    // default checkpoint timeout is 10min
+                    .setSocketTimeout(9 * 60 * 1000)
+                    .build();
+
+    public HttpClientBuilder getHttpClientBuilderForBatch() {
+        return HttpClients.custom()
+                .setRedirectStrategy(
+                        new DefaultRedirectStrategy() {
+                            @Override
+                            protected boolean isRedirectable(String method) {
+                                return true;
+                            }
+                        })
+                .setDefaultRequestConfig(requestConfig);
+    }
+
+    public HttpClientBuilder getHttpClientBuilderForCopyBatch() {
+        return HttpClients.custom()
+                .disableRedirectHandling()
+                .setDefaultRequestConfig(requestConfig);
     }
 }
