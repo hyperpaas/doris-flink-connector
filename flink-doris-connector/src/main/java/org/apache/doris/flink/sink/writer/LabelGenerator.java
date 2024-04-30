@@ -49,21 +49,21 @@ public class LabelGenerator {
 
     public String generateLabel(long chkId) {
         String label = String.format("%s_%s_%s", labelPrefix, subtaskId, chkId);
-        return enable2PC ? label : label + "_" + UUID.randomUUID();
+        return enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     public String generateTableLabel(long chkId) {
         Preconditions.checkState(tableIdentifier != null);
         String label = String.format("%s_%s_%s_%s", labelPrefix, tableIdentifier, subtaskId, chkId);
-        return enable2PC ? label : label + "_" + UUID.randomUUID();
+        return enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     public String generateBatchLabel() {
-        return labelPrefix + "_" + UUID.randomUUID();
+        return labelPrefix + "_" + UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     public String generateBatchLabel(String table) {
-        return String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID());
+        return String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID().toString().replaceAll("-", ""));
     }
 
     public String generateCopyBatchLabel(String table, long chkId, int fileNum) {
