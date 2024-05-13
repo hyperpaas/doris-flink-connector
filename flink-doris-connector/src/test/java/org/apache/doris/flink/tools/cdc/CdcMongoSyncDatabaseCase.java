@@ -20,64 +20,65 @@ package org.apache.doris.flink.tools.cdc;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import org.apache.doris.flink.tools.cdc.oracle.OracleDatabaseSync;
+import org.apache.doris.flink.tools.cdc.mongodb.MongoDBDatabaseSync;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CdcOraclelSyncDatabaseCase {
-
+public class CdcMongoSyncDatabaseCase {
     public static void main(String[] args) throws Exception {
-
+        Configuration conf = new Configuration();
+        //        conf.setString(RestOptions.BIND_PORT, "8018");
+        //        conf.setString("rest.flamegraph.enabled", "true");
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
-        env.disableOperatorChaining();
-        env.enableCheckpointing(10000);
+        //        StreamExecutionEnvironment env =
+        //                StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+        Map<String, String> flinkMap = new HashMap<>();
+        flinkMap.put("execution.checkpointing.interval", "10s");
+        flinkMap.put("pipeline.operator-chaining", "false");
+        flinkMap.put("parallelism.default", "8");
 
-        //  Map<String,String> flinkMap = new HashMap<>();
-        //  flinkMap.put("execution.checkpointing.interval","10s");
-        //  flinkMap.put("pipeline.operator-chaining","false");
-        //  flinkMap.put("parallelism.default","1");
-
-        //  Configuration configuration = Configuration.fromMap(flinkMap);
-        //  env.configure(configuration);
-
-        String database = "db1";
+        String database = "cdc_test";
         String tablePrefix = "";
         String tableSuffix = "";
-        Map<String, String> sourceConfig = new HashMap<>();
-        sourceConfig.put("database-name", "XE");
-        sourceConfig.put("schema-name", "ADMIN");
-        sourceConfig.put("hostname", "127.0.0.1");
-        sourceConfig.put("port", "1521");
-        sourceConfig.put("username", "admin");
-        sourceConfig.put("password", "");
-        // sourceConfig.put("debezium.database.tablename.case.insensitive","false");
-        sourceConfig.put("debezium.log.mining.strategy", "online_catalog");
-        sourceConfig.put("debezium.log.mining.continuous.mine", "true");
-        sourceConfig.put("debezium.database.history.store.only.captured.tables.ddl", "true");
-        Configuration config = Configuration.fromMap(sourceConfig);
+
+        Configuration configuration = Configuration.fromMap(flinkMap);
+        env.configure(configuration);
+        Map<String, String> mongoConfig = new HashMap<>();
+        mongoConfig.put("database", "test");
+        mongoConfig.put("hosts", "127.0.0.1:27017");
+        mongoConfig.put("username", "flinkuser");
+        // mysqlConfig.put("password","");
+        mongoConfig.put("password", "flinkpwd");
+        //                        mongoConfig.put("scan.startup.mode", "latest-offset");
+        mongoConfig.put("scan.startup.mode", "initial");
+        mongoConfig.put("schema.sample-percent", "1");
+        Configuration config = Configuration.fromMap(mongoConfig);
 
         Map<String, String> sinkConfig = new HashMap<>();
-        sinkConfig.put("fenodes", "10.20.30.1:8030");
+        sinkConfig.put("fenodes", "127.0.0.1:8030");
         // sinkConfig.put("benodes","10.20.30.1:8040, 10.20.30.2:8040, 10.20.30.3:8040");
         sinkConfig.put("username", "root");
         sinkConfig.put("password", "");
-        sinkConfig.put("jdbc-url", "jdbc:mysql://10.20.30.1:9030");
+        sinkConfig.put("jdbc-url", "jdbc:mysql://127.0.0.1:9030");
         sinkConfig.put("sink.label-prefix", UUID.randomUUID().toString());
+        sinkConfig.put("auto-redirect", "false");
+        //        sinkConfig.put("sink.enable.batch-mode","true");
+        //        sinkConfig.put("sink.write-mode","stream_load_batch");
         Configuration sinkConf = Configuration.fromMap(sinkConfig);
 
         Map<String, String> tableConfig = new HashMap<>();
         tableConfig.put("replication_num", "1");
-        tableConfig.put("table-buckets", "tbl1:10,tbl2:20,a.*:30,b.*:40,.*:50");
-        String includingTables = "a_.*|b_.*|c";
+        tableConfig.put("table-buckets", ".*:1");
+        String includingTables = "cdc_test";
+        //        String includingTables = "a_.*|b_.*|c";
         String excludingTables = "";
         String multiToOneOrigin = "a_.*|b_.*";
         String multiToOneTarget = "a|b";
         boolean ignoreDefaultValue = false;
-        boolean useNewSchemaChange = false;
-        DatabaseSync databaseSync = new OracleDatabaseSync();
+        //        boolean useNewSchemaChange = false;
+        DatabaseSync databaseSync = new MongoDBDatabaseSync();
         databaseSync
                 .setEnv(env)
                 .setDatabase(database)
@@ -92,9 +93,10 @@ public class CdcOraclelSyncDatabaseCase {
                 .setSinkConfig(sinkConf)
                 .setTableConfig(tableConfig)
                 .setCreateTableOnly(false)
-                .setNewSchemaChange(useNewSchemaChange)
+                //                .setSingleSink(true)
+                //                .setNewSchemaChange(useNewSchemaChange)
                 .create();
         databaseSync.build();
-        env.execute(String.format("Oracle-Doris Database Sync: %s", database));
+        env.execute(String.format("Mongo-Doris Database Sync: %s", database));
     }
 }

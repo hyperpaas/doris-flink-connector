@@ -53,6 +53,8 @@ import static org.apache.doris.flink.catalog.doris.DorisType.DECIMAL_V3;
 import static org.apache.doris.flink.catalog.doris.DorisType.DOUBLE;
 import static org.apache.doris.flink.catalog.doris.DorisType.FLOAT;
 import static org.apache.doris.flink.catalog.doris.DorisType.INT;
+import static org.apache.doris.flink.catalog.doris.DorisType.IPV4;
+import static org.apache.doris.flink.catalog.doris.DorisType.IPV6;
 import static org.apache.doris.flink.catalog.doris.DorisType.JSON;
 import static org.apache.doris.flink.catalog.doris.DorisType.JSONB;
 import static org.apache.doris.flink.catalog.doris.DorisType.LARGEINT;
@@ -62,6 +64,7 @@ import static org.apache.doris.flink.catalog.doris.DorisType.STRING;
 import static org.apache.doris.flink.catalog.doris.DorisType.STRUCT;
 import static org.apache.doris.flink.catalog.doris.DorisType.TINYINT;
 import static org.apache.doris.flink.catalog.doris.DorisType.VARCHAR;
+import static org.apache.doris.flink.catalog.doris.DorisType.VARIANT;
 
 public class DorisTypeMapper {
 
@@ -116,13 +119,16 @@ public class DorisTypeMapper {
                 // so it is mapped to string
             case MAP:
             case STRUCT:
+            case IPV4:
+            case IPV6:
+            case VARIANT:
                 return DataTypes.STRING();
             case DATE:
             case DATE_V2:
                 return DataTypes.DATE();
             case DATETIME:
             case DATETIME_V2:
-                return DataTypes.TIMESTAMP(0);
+                return DataTypes.TIMESTAMP(scale);
             default:
                 throw new UnsupportedOperationException(
                         String.format(

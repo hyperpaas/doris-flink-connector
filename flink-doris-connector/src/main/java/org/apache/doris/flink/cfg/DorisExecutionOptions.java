@@ -32,7 +32,8 @@ import static org.apache.doris.flink.sink.writer.LoadConstants.READ_JSON_BY_LINE
 public class DorisExecutionOptions implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public static final int DEFAULT_CHECK_INTERVAL = 10000;
+    // 0 means disable checker thread
+    public static final int DEFAULT_CHECK_INTERVAL = 0;
     public static final int DEFAULT_MAX_RETRY_TIMES = 3;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 1024;
     private static final int DEFAULT_BUFFER_COUNT = 3;
@@ -292,6 +293,9 @@ public class DorisExecutionOptions implements Serializable {
 
         public Builder setBatchMode(Boolean enableBatchMode) {
             this.enableBatchMode = enableBatchMode;
+            if (enableBatchMode.equals(Boolean.TRUE)) {
+                this.writeMode = WriteMode.STREAM_LOAD_BATCH;
+            }
             return this;
         }
 
