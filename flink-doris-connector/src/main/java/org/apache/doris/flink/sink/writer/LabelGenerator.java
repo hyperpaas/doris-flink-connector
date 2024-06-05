@@ -47,21 +47,11 @@ public class LabelGenerator {
         this.subtaskId = subtaskId;
     }
 
-    public String generateLabel(long chkId) {
-        String label = String.format("%s_%s_%s", labelPrefix, subtaskId, chkId);
-        String uuidLabel = enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
-        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
-    }
 
     public String generateTableLabel(long chkId) {
         Preconditions.checkState(tableIdentifier != null);
         String label = String.format("%s_%s_%s_%s", labelPrefix, tableIdentifier, subtaskId, chkId);
         String uuidLabel = enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
-        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
-    }
-
-    public String generateBatchLabel() {
-        String uuidLabel = labelPrefix + "_" + UUID.randomUUID().toString().replaceAll("-", "");
         return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
