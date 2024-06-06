@@ -49,29 +49,34 @@ public class LabelGenerator {
 
     public String generateLabel(long chkId) {
         String label = String.format("%s_%s_%s", labelPrefix, subtaskId, chkId);
-        return enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        String uuidLabel = enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
     public String generateTableLabel(long chkId) {
         Preconditions.checkState(tableIdentifier != null);
         String label = String.format("%s_%s_%s_%s", labelPrefix, tableIdentifier, subtaskId, chkId);
-        return enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        String uuidLabel = enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
     public String generateBatchLabel() {
-        return labelPrefix + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        String uuidLabel = labelPrefix + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
     public String generateBatchLabel(String table) {
-        return String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID().toString().replaceAll("-", ""));
+        String uuidLabel = String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID().toString().replaceAll("-", ""));
+        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
     public String generateCopyBatchLabel(String table, long chkId, int fileNum) {
-        return String.format("%s_%s_%s_%s_%s", labelPrefix, table, subtaskId, chkId, fileNum);
+        String uuidLabel = String.format("%s_%s_%s_%s_%s", labelPrefix, table, subtaskId, chkId, fileNum);
+        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
     public String getConcatLabelPrefix() {
         String concatPrefix = String.format("%s_%s_%s", labelPrefix, tableIdentifier, subtaskId);
-        return concatPrefix;
+        return concatPrefix.length() > 128 ? concatPrefix.substring(0, 128) : concatPrefix;
     }
 }
