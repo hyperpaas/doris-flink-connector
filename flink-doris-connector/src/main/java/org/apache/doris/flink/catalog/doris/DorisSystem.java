@@ -286,6 +286,9 @@ public class DorisSystem implements Serializable {
     }
 
     public static String identifier(String name) {
+        if (name.startsWith("`") && name.endsWith("`")) {
+            return name;
+        }
         return "`" + name + "`";
     }
 
