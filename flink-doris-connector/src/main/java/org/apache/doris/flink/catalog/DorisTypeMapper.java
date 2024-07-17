@@ -47,6 +47,7 @@ import org.apache.doris.flink.catalog.doris.DorisType;
 
 import static org.apache.doris.flink.catalog.doris.DorisType.ARRAY;
 import static org.apache.doris.flink.catalog.doris.DorisType.BIGINT;
+import static org.apache.doris.flink.catalog.doris.DorisType.BIGINT_UNSIGNED;
 import static org.apache.doris.flink.catalog.doris.DorisType.BOOLEAN;
 import static org.apache.doris.flink.catalog.doris.DorisType.CHAR;
 import static org.apache.doris.flink.catalog.doris.DorisType.DATE;
@@ -117,6 +118,7 @@ public class DorisTypeMapper {
                 // Here, return Array<string> as the type
                 return DataTypes.ARRAY(DataTypes.STRING());
             case LARGEINT:
+            case BIGINT_UNSIGNED:
             case STRING:
             case JSONB:
             case JSON:
