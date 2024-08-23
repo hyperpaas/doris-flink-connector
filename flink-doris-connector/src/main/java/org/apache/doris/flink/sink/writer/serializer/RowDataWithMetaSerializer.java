@@ -72,6 +72,7 @@ public class RowDataWithMetaSerializer implements DorisRecordSerializer<RowDataW
     } else {
       throw new IllegalArgumentException("The type " + type + " is not supported!");
     }
+    LOG.info("rowDataWithMeta serialize success, valString:{}", valString);
     return DorisRecord.of(
         meta.getDatabase(), meta.getTable(), valString.getBytes(StandardCharsets.UTF_8));
   }
