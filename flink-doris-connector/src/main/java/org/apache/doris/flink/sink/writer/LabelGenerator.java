@@ -20,9 +20,13 @@ package org.apache.doris.flink.sink.writer;
 import org.apache.flink.util.Preconditions;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /** Generator label for stream load. */
 public class LabelGenerator {
+    // doris default label regex
+    private static final String LABEL_REGEX = "^[-_A-Za-z0-9:]{1,128}$";
+    private static final Pattern LABEL_PATTERN = Pattern.compile(LABEL_REGEX);
     private String labelPrefix;
     private boolean enable2PC;
     private String tableIdentifier;
@@ -47,16 +51,37 @@ public class LabelGenerator {
         this.subtaskId = subtaskId;
     }
 
-
     public String generateTableLabel(long chkId) {
         Preconditions.checkState(tableIdentifier != null);
         String label = String.format("%s_%s_%s_%s", labelPrefix, tableIdentifier, subtaskId, chkId);
-        String uuidLabel = enable2PC ? label : label + "_" + UUID.randomUUID().toString().replaceAll("-", "");
-        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
+
+        if (!enable2PC) {
+          label = label + "_" + UUID.randomUUID();
+        }
+
+        if (LABEL_PATTERN.matcher(label).matches()) {
+          // The unicode table name or length exceeds the limit
+          return label.length() > 128 ? label.substring(0, 128) : label;
+        }
+
+        if (enable2PC) {
+          // In 2pc, replace uuid with the table name. This will cause some txns to fail to be
+          // aborted when aborting.
+          // Later, the label needs to be stored in the state and aborted through label
+          String uuidLabel = String.format("%s_%s_%s_%s", labelPrefix, UUID.randomUUID(), subtaskId, chkId);
+          return label.length() > 128 ? label.substring(0, 128) : label;
+        } else {
+          String uuidLabel =  String.format("%s_%s_%s_%s", labelPrefix, subtaskId, chkId, UUID.randomUUID());
+          return label.length() > 128 ? label.substring(0, 128) : label;
+        }
     }
 
     public String generateBatchLabel(String table) {
-        String uuidLabel = String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID().toString().replaceAll("-", ""));
+        String uuidLabel = String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID().toString());
+        if (!LABEL_PATTERN.matcher(label).matches()) {
+          String uuidLabel = labelPrefix + "_" + uuid;
+          return label.length() > 128 ? label.substring(0, 128) : label;
+        }
         return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
