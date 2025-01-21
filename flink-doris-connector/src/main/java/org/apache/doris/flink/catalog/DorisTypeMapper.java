@@ -251,12 +251,12 @@ public class DorisTypeMapper {
 
         @Override
         public String visit(TimeType timeType) {
-          return String.format(ArrayType.FORMAT, visit((VarCharType) arrayType.getElementType()));
+            return STRING;
         }
 
         @Override
         public String visit(ArrayType arrayType) {
-            return STRING;
+            return String.format(ArrayType.FORMAT, visit((VarCharType) arrayType.getElementType()));
         }
 
         @Override

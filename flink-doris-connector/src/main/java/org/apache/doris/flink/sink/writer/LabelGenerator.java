@@ -56,37 +56,41 @@ public class LabelGenerator {
         String label = String.format("%s_%s_%s_%s", labelPrefix, tableIdentifier, subtaskId, chkId);
 
         if (!enable2PC) {
-          label = label + "_" + UUID.randomUUID();
+            label = label + "_" + UUID.randomUUID();
         }
 
         if (LABEL_PATTERN.matcher(label).matches()) {
-          // The unicode table name or length exceeds the limit
-          return label.length() > 128 ? label.substring(0, 128) : label;
+            // The unicode table name or length exceeds the limit
+            return label.length() > 128 ? label.substring(0, 128) : label;
         }
 
         if (enable2PC) {
-          // In 2pc, replace uuid with the table name. This will cause some txns to fail to be
-          // aborted when aborting.
-          // Later, the label needs to be stored in the state and aborted through label
-          String uuidLabel = String.format("%s_%s_%s_%s", labelPrefix, UUID.randomUUID(), subtaskId, chkId);
-          return label.length() > 128 ? label.substring(0, 128) : label;
+            // In 2pc, replace uuid with the table name. This will cause some txns to fail to be
+            // aborted when aborting.
+            // Later, the label needs to be stored in the state and aborted through label
+            String uuidLabel =
+                    String.format("%s_%s_%s_%s", labelPrefix, UUID.randomUUID(), subtaskId, chkId);
+            return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
         } else {
-          String uuidLabel =  String.format("%s_%s_%s_%s", labelPrefix, subtaskId, chkId, UUID.randomUUID());
-          return label.length() > 128 ? label.substring(0, 128) : label;
+            String uuidLabel =
+                    String.format("%s_%s_%s_%s", labelPrefix, subtaskId, chkId, UUID.randomUUID());
+            return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
         }
     }
 
     public String generateBatchLabel(String table) {
-        String uuidLabel = String.format("%s_%s_%s", labelPrefix, table, UUID.randomUUID().toString());
+        String uuid = UUID.randomUUID().toString();
+        String label = String.format("%s_%s_%s", labelPrefix, table, uuid);
         if (!LABEL_PATTERN.matcher(label).matches()) {
-          String uuidLabel = labelPrefix + "_" + uuid;
-          return label.length() > 128 ? label.substring(0, 128) : label;
+            String uuidLabel = labelPrefix + "_" + uuid;
+            return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
         }
-        return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
+        return label.length() > 128 ? label.substring(0, 128) : label;
     }
 
     public String generateCopyBatchLabel(String table, long chkId, int fileNum) {
-        String uuidLabel = String.format("%s_%s_%s_%s_%s", labelPrefix, table, subtaskId, chkId, fileNum);
+        String uuidLabel =
+                String.format("%s_%s_%s_%s_%s", labelPrefix, table, subtaskId, chkId, fileNum);
         return uuidLabel.length() > 128 ? uuidLabel.substring(0, 128) : uuidLabel;
     }
 
