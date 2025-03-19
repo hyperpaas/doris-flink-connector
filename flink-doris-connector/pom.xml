@@ -428,6 +428,17 @@ under the License.
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>hyperpaas_release</id>
+            <url>https://nexus.hyperpaas-inc.com/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>hyperpaas_snapshot</id>
+            <url>https://nexus.hyperpaas-inc.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <pluginManagement>
             <plugins>

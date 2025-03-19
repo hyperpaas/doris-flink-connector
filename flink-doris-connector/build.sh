@@ -172,7 +172,7 @@ FLINK_MAJOR_VERSION=0
 echo_g " flink version: ${FLINK_VERSION}, major version: ${FLINK_MAJOR_VERSION}"
 echo_g " build starting..."
 
-${MVN_BIN} clean package install -Dmaven.repo.local=/Users/hyperman/environment/apache-maven-3.8.6/repo -Dflink.version=${FLINK_VERSION} -Dflink.major.version=${FLINK_MAJOR_VERSION} -DskipTests -Dflink.python.id=${FLINK_PYTHON_ID} "$@"
+${MVN_BIN} clean package install -Dmaven.repo.local=/home/peatboy/.m2/repository -Dflink.version=${FLINK_VERSION} -Dflink.major.version=${FLINK_MAJOR_VERSION} -DskipTests -Dflink.python.id=${FLINK_PYTHON_ID} "$@"
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
